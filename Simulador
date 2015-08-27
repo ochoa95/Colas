@@ -1,4 +1,3 @@
-
 import simpy
 import random
 
@@ -12,44 +11,73 @@ import random
 # driving_time: tiempo que conduce antes de necesitar carga
 # charge_duration: tiempo que toma cargar la bateria
 
-def car(env, name, bcs, driving_time, charge_duration):
-    # Simulate driving to the BCS
-    yield env.timeout(driving_time)
+--------------------------------------------------------------------------------
+    #REALIZA LAS COLAS
+    #with bcs.request() as req:  #pedimos conectarnos al cargador de bateria
+        #yield req
 
+        #    Charge the battery
+        #print('%s starting to charge at %s' % (name, env.now))
+        #yield env.timeout(charge_duration)
+        #print('%s leaving the bcs at %s' % (name, env.now))
+        #    se hizo release automatico del cargador bcs
+--------------------------------------------------------------------------
+RAM = 100
 
-    tiempoLlegada = env.now 
+#Ingresa proceso al sistema si hay ram suficiente
+def new (ramP):
+    global RAM
+
+    #utilizar container para verificar si es posible tomar RAm e ingresar a procesos
+    for i in range(ramP):
+        with bcs.request() as req:  #pedimos conectarnos al cargador de bateria
+            yield req
+        #    tomar ram de SO
+        
+def wait (esperar):
+
+    yield env.timeout(esperar)
+
     
-    # Request one of its charging spots
-    print('%s arriving at %d' % (name, env.now))
-    with bcs.request() as req:  #pedimos conectarnos al cargador de bateria
-        yield req
+def running (delay,procesos):
 
-        # Charge the battery
-        print('%s starting to charge at %s' % (name, env.now))
-        yield env.timeout(charge_duration)
-        print('%s leaving the bcs at %s' % (name, env.now))
-        # se hizo release automatico del cargador bcs
-    tiempoTotal = env.now - tiempoLlegada 
-    print('%s total time was %s' % (name, tiempoTotal))
-    tiempoTodos = tiempoTodos + tiempoTotal
+    for i in range(3):
+        if  (procesos>0):
+            yield env.timeout(delay)
+            procesos = procesos - 1
+    if (procesos = 0):
+        #devolver ram
+
+
+
     
-#
+        
+    
+    
+    
+################################################################
 env = simpy.Environment()  #crear ambiente de simulacion
-bcs = simpy.Resource(env, capacity=2) #el cargador de bateria soporta 2 carros
-                                      #a la vez
+bcs = simpy.Resource(env, capacity=100) #Declaracion de la cantidad de RAM para los procesos
 
 RANDOM_SEED = 42
 random.seed(RANDOM_SEED)
 
 
+
 # crear los carros
+
 for i in range(5):
+    
+    interval = 10
     t = random.expovariate(1.0/interval)
-    carga = random.randint (1,5)
-    env.process(car(env, 'Car %d' % i, bcs, t, carga))
+    ram = random.randint (1,10)
+    tiempoXproceso = 1
+    instP = random.randint (1,10)
+    env.process(new(ram))
+    env.process(running(tiempoXproceso,instP))
+    waitOready = radom.randint (1,2)
+    if (waitOready = 1):
+        env.process(ready(t))
 
 # correr la simulacion
 env.run()
-#calcular promedio
-promedio = tiempoTodos / 5
-print "el promedio es de " promedio
