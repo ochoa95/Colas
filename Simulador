@@ -45,7 +45,7 @@ def running (delay,procesos):
         if  (procesos>0):
             yield env.timeout(delay)
             procesos = procesos - 1
-    if (procesos = 0):
+    if (procesos == 0):
         #devolver ram
 
 
@@ -76,7 +76,7 @@ for i in range(5):
     env.process(new(ram))
     env.process(running(tiempoXproceso,instP))
     waitOready = radom.randint (1,2)
-    if (waitOready = 1):
+    if (waitOready == 1):
         env.process(ready(t))
 
 # correr la simulacion
